@@ -171,26 +171,34 @@ def addLibraryWindow():
     # Create a new top-level window
     library_window = CTkToplevel()
     library_window.title("Add to Library")
-    library_window.geometry("400x300")
 
-    library_window.grid_columnconfigure(0, weight=1)
-    library_window.grid_rowconfigure(0, weight=1)
+    library_window.geometry("290x250")
+    library_window.minsize(290, 250)
+    library_window.maxsize(290, 250)
 
     library_window.focus_force()
     library_window.transient(app)
 
     # Frame inside top-level
     main_add_library_frame = CTkFrame(master=library_window)
-    main_add_library_frame.grid(sticky="ew",padx=10, pady=10, row=0, column=0)
+    main_add_library_frame.grid(sticky="nsew",padx=15, pady=15)
     main_add_library_frame.grid_columnconfigure(0, weight=1)
-    main_add_library_frame.grid_rowconfigure(0, weight=1)
 
-    # Helper function to create label + button
+    # Helper function to create label + button in a horizontal layout
     def createLabeledButton(row, label_text, btn_text, command):
-        label = CTkLabel(master=main_add_library_frame, text=label_text)
-        label.grid(row=row*2, column=0, sticky="w", pady=5)
-        btn = CTkButton(master=main_add_library_frame, text=btn_text, command=command)
-        btn.grid(row=row*2+1, column=0, pady=5)
+        # Container frame for label + button
+        container = CTkFrame(master=main_add_library_frame, fg_color="#3c3c3c", corner_radius=6)
+        container.grid(sticky="ew", pady=5, padx=5)
+        container.grid_columnconfigure(0, weight=1)
+        container.grid_columnconfigure(1, weight=0)
+
+        # Label (left side)
+        label = CTkLabel(master=container, text=label_text, anchor="w", wraplength=100)
+        label.grid(row=0, column=0, sticky="w", padx=10, pady=5)
+
+        # Button (right side)
+        btn = CTkButton(master=container, text=btn_text, width=100, command=command)
+        btn.grid(row=0, column=1, padx=10, pady=5)
         return label
 
     # Path
@@ -238,10 +246,10 @@ def addLibraryWindow():
     # Confirm Button
     confirm_button = CTkButton(
         master=library_window,
-        text="Confirm",
+        text="Add to library",
         command=lambda: addGameToJSON()
     )
-    confirm_button.grid(row=6, column=0, pady=5)
+    confirm_button.grid(row=1, column=0, pady=15)
 
     def addGameToJSON():
         # Get values from labels
