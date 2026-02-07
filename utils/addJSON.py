@@ -1,45 +1,34 @@
 from .readJSON import *
-import json
-
+import json, os
 
 def writeJSON(path, content, game_title):
     data = readJSON(path) # Read json
 
-    # Make sure "games" key exists
-    if "games" not in data:
-        data["games"] = {}
-
-    # Add or update the game
+    data.setdefault("games", {}) # Ensure games exists
     data["games"][game_title] = content
 
-    # Save back to file
-    with open(path, "w") as f:
-        json.dump(data, f, indent=4)
+    _saveJSON(path, data) # Save JSON
 
 def removeJSON(path, game_title):
-    data = readJSON(path) # Read json
+    data = readJSON(path)
 
-    # Make sure "games" key exists
-    if "games" not in data:
-        data["games"] = {}
+    games = data.get("games", {})
+    if game_title in games:
+        del games[game_title]
 
-    # Remove the game
-    if game_title in data["games"]:
-        del data["games"][game_title]
-
-    # Save back to file
-    with open(path, "w") as f:
-        json.dump(data, f, indent=4)
-
+    _saveJSON(path, data) # Save JSON
 
 def addSetting(path, key, content):
     data = readJSON(path) # Read json
 
-    # Update the theme
-    if "settings" not in data:
-        data["settings"] = {}
+    data.setdefault("settings", {}) # Ensure settings exists
     data["settings"][key] = content
 
-    # Write back to the file
-    with open(path, "w") as f:
-        json.dump(data, f, indent=4)
+    _saveJSON(path,data)
+
+def _saveJSON(path, data):
+    try: # Try
+        with open(path, "w", encoding="utf-8") as f: # Writes to JSON
+            json.dump(data, f, indent=4) # Actually writes it
+    except Exception as e: # Some exception, return error
+        print(f"Failed to write JSON to {path}: {e}")
