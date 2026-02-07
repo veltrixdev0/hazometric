@@ -223,60 +223,44 @@ def addLibraryWindow():
             addGameFrame(games_scroll_frame, title_text, description_text, False, row_index)
 
 def changeTheme(theme_or_var, update=False):
-    # Determine if input is StringVar or string
-    if isinstance(theme_or_var, StringVar):
-        theme = theme_or_var.get()
-    else:
-        theme = theme_or_var  # assume string
-
+    # Determine theme string
+    theme = theme_or_var.get() if isinstance(theme_or_var, StringVar) else theme_or_var
     set_appearance_mode(theme)
 
-    # Check if update is needed
-    if update:
-        app.update_idletasks()
-
-    # Update JSON if needed
+    # Save to JSON if requested
     if update:
         addSetting(os.path.join(SAVE_PATH, "userData.json"), "theme", theme)
+        app.update_idletasks()
 
+def addSettingsWindow():
+    # Load the latest theme directly from JSON
+    saveLatest = readJSON(os.path.join(SAVE_PATH, "userData.json"))
+    currentTheme = saveLatest.get("settings", {}).get("theme", "dark")  # default to dark
 
-def addSettingsWindow(isDarkModeOn="dark"): # Settings window
-    # Settings toplevel window configuration
     settings_window = CTkToplevel()
-    settings_window.title("Add to Library")
-    settings_window.geometry("400x300")
-
-    settings_window.grid_columnconfigure(0, weight=1)
-    settings_window.grid_rowconfigure(0, weight=1)
-
-    settings_window.focus_force()
+    settings_window.title("Settings")
+    settings_window.geometry("400x200")
     settings_window.transient(app)
+    settings_window.focus_force()
 
-    # Frame inside top-level
-    main_settings_frame = CTkFrame(master=settings_window)
-    main_settings_frame.grid(sticky="ew",padx=10, pady=10, row=0, column=0)
-    main_settings_frame.grid_columnconfigure(0, weight=1)
-    main_settings_frame.grid_rowconfigure(0, weight=1)
+    main_frame = CTkFrame(settings_window)
+    main_frame.grid(sticky="nsew", padx=10, pady=10)
+    main_frame.grid_columnconfigure(0, weight=1)
 
-    # Dark mode check box
-    darkmode_var = StringVar(value=isDarkModeOn)
-    dark_mode_check_box = CTkCheckBox(
-        master=main_settings_frame,
+    theme_var = StringVar(value=currentTheme)
+
+    dark_checkbox = CTkCheckBox(
+        master=main_frame,
         text="Dark Mode",
-        variable=darkmode_var,
+        variable=theme_var,
         onvalue="dark",
         offvalue="light",
-        command=lambda: changeTheme(darkmode_var, update=True)
+        command=lambda: changeTheme(theme_var, update=True)
     )
-    dark_mode_check_box.grid(row=0, column=0)
-
-
+    dark_checkbox.grid(row=0, column=0, pady=10)
+    
 # Load save data from latest session
 saveLatest = readJSON(os.path.join(SAVE_PATH, "userData.json"))
-
-# Main App Configuration
-
-changeTheme(saveLatest["settings"]["theme"], update=False)
 
 app = CTk()
 app.title("hazometric")
@@ -289,6 +273,8 @@ app.grid_columnconfigure(0, weight=0) # Configures the grid columns
 app.grid_columnconfigure(1, weight=1) # Configures the grid columns
 app.grid_rowconfigure(0, weight=1) # Configures the grid rows
 app.grid_rowconfigure(1, weight=0) # Configures the grid rows
+
+changeTheme(saveLatest["settings"]["theme"], update=False)
 
 # Games Scroll Frame
 games_scroll_frame = CTkScrollableFrame(master=app, width=200, height=400)
@@ -305,9 +291,8 @@ games_add_button = CTkButton(master=utils_frame, text="Add to library", command=
 games_add_button.grid(row=0, column=0, pady=5)
 
 # Settings button
-games_settings_button = CTkButton(master=utils_frame, text="Settings", command=lambda: addSettingsWindow(saveLatest["settings"]["theme"]))
+games_settings_button = CTkButton(master=utils_frame, text="Settings", command=lambda: addSettingsWindow())
 games_settings_button.grid(row=1, column=0, pady=5)
-
 
 # Tab View Frame
 tab_view_frame = CTkTabview(master=app, width=350, height=400)
