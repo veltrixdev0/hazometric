@@ -18,6 +18,17 @@ ABS_PATH = os.path.dirname(os.path.abspath(__file__)) # Get absolute path
 SAVE_PATH = os.path.join(ABS_PATH, "save")
 theme_initialized = False
 
+# Store references to game buttons for fast access
+game_buttons = {}
+
+# Load save data from startup
+saveLatest = readJSON(os.path.join(SAVE_PATH, "userData.json"))
+
+# Reload JSON after changes
+def reloadJSON():
+    global saveLatest
+    saveLatest = readJSON(os.path.join(SAVE_PATH, "userData.json")) 
+
 def runPath(application): # Run Path to .exe or other application
     print(f"Running {application}") # Debug
     os.startfile(application) # Starts the file
@@ -66,10 +77,12 @@ def find_widgets_by_text(parent, text): # Finds all widgets by text
 
 def removeFromLibrary(title): # Removes from library
     removeJSON(os.path.join(SAVE_PATH, "userData.json"), title) # The Function from another file
-    
-    buttons = find_widgets_by_text(games_scroll_frame, title) # Gets all the buttons
-    for button in buttons: # Buttons for loop
-        button.destroy() # destroys all buttons
+    reloadJSON() # Refresh after removval
+
+    # Destroy the buttons after stored reference instead of searching tree
+    if title in game_buttons:
+        game_buttons[title].destroy()
+        del game_buttons[title]
 
     removeAndSetBackToHome(title) # Sets back at home
 
@@ -94,7 +107,7 @@ def gameViewFrame(title, description):
     saveLatestJSON = readJSON(os.path.join(SAVE_PATH, "userData.json"))
 
     # Fetch the game info from JSON
-    game = saveLatestJSON.get("games", {}).get(title)
+    game = saveLatest.get("games", {}).get(title) # Cache JSON
     if not game:
         print(f"Game '{title}' not found in JSON.")
         return  # Exit early if game not found
@@ -127,12 +140,12 @@ def gameViewFrame(title, description):
 
 
 def addGameFrame(parent, title, description, logo, row): # Game Card
-    # Gets the latest save
-    saveLatest = readJSON(os.path.join(SAVE_PATH, "userData.json"))
-
     # Game Card Button
-    game_card_frame = CTkButton(master=parent, text=title, command=lambda: addAndSet(title=title, desc=description))
-    game_card_frame.grid(sticky="ew", pady=4, row=row, column=0)
+    btn = CTkButton(master=parent, text=title, command=lambda: addAndSet(title=title, desc=description))
+    btn.grid(sticky="ew", pady=4, row=row, column=0)
+
+    # Store reference for fast removal
+    game_buttons[title] = btn
 
 def addLibraryWindow():
     # Variables Configuration
@@ -157,13 +170,21 @@ def addLibraryWindow():
     main_add_library_frame.grid_columnconfigure(0, weight=1)
     main_add_library_frame.grid_rowconfigure(0, weight=1)
 
-    # Path label
-    add_library_path_label = CTkLabel(master=main_add_library_frame, text=f"Path: {path}")
-    add_library_path_label.grid(row=0, column=0, sticky="w", pady=5)
+    # Helper function to create label + button
+    def createLabeledButton(row, label_text, btn_text, command):
+        label = CTkLabel(master=main_add_library_frame, text=label_text)
+        label.grid(row=row*2, column=0, sticky="w", pady=5)
+        btn = CTkButton(master=main_add_library_frame, text=btn_text, command=command)
+        btn.grid(row=row*2+1, column=0, pady=5)
+        return label
 
-    # Button to open dialog
-    choose_path_button = CTkButton(master=main_add_library_frame, text="Choose exe", command=lambda: choosePath(add_library_path_label))
-    choose_path_button.grid(row=1, column=0, pady=5)
+    # Path
+    add_library_path_label = createLabeledButton(
+        0,
+        f"Path: {path}",
+        "Choose exe",
+        lambda: choosePath(add_library_path_label)
+    )
 
     def choosePath(label): # Dialog for the path
         dialog = CTkInputDialog(text="Type in the path of the exe:", title="Path to exe")
@@ -171,36 +192,40 @@ def addLibraryWindow():
         if pathVar:
             label.configure(text=f"Path: {pathVar}")
 
-    # Title label
-    add_library_title_label = CTkLabel(master=main_add_library_frame, text=f"Title: {title}")
-    add_library_title_label.grid(row=2, column=0, sticky="w", pady=5)
+    # Title
+    add_library_title_label = createLabeledButton(
+        1,
+        f"Title: {title}",
+        "Choose title",
+        lambda: chooseTitle(add_library_title_label)
+    )
 
-    # Button to open dialog
-    choose_title_button = CTkButton(master=main_add_library_frame, text="Choose title", command=lambda: chooseTitle(add_library_title_label))
-    choose_title_button.grid(row=3, column=0, pady=5)
-
-    def chooseTitle(label): # Dialog for the path
+    def chooseTitle(label): # Dialog for the title
         dialog = CTkInputDialog(text="Type in the title of the application:", title="Title of the application")
         titleVar = dialog.get_input()
         if titleVar:
             label.configure(text=f"Title: {titleVar}")
 
-    # Description label
-    add_library_description_label = CTkLabel(master=main_add_library_frame, text=f"Description: {description}")
-    add_library_description_label.grid(row=4, column=0, sticky="w", pady=5)
+    # Description
+    add_library_description_label = createLabeledButton(
+        2,
+        f"Description: {description}",
+        "Choose description",
+        lambda: chooseDescription(add_library_description_label)
+    )
 
-    # Button to open dialog
-    choose_description_button = CTkButton(master=main_add_library_frame, text="Choose description", command=lambda: chooseDescription(add_library_description_label))
-    choose_description_button.grid(row=5, column=0, pady=5)
-
-    def chooseDescription(label): # Dialog for the path
+    def chooseDescription(label): # Dialog for the description
         dialog = CTkInputDialog(text="Type in the description of the application:", title="Description of the application")
         descriptionVar = dialog.get_input()
         if descriptionVar:
             label.configure(text=f"Description: {descriptionVar}")
 
     # Confirm Button
-    confirm_button = CTkButton(master=library_window, text="Confirm", command=lambda: addGameToJSON())
+    confirm_button = CTkButton(
+        master=library_window,
+        text="Confirm",
+        command=lambda: addGameToJSON()
+    )
     confirm_button.grid(row=6, column=0, pady=5)
 
     def addGameToJSON():
@@ -215,6 +240,7 @@ def addLibraryWindow():
                 {"title": title_text, "description": description_text, "path": path_text},
                 title_text
             )
+            reloadJSON()  # Reload after adding
 
             # Gets the exact number of game frames
             row_index = len(games_scroll_frame.winfo_children()) 
@@ -234,21 +260,24 @@ def changeTheme(theme_or_var, update=False):
 
 def addSettingsWindow():
     # Load the latest theme directly from JSON
-    saveLatest = readJSON(os.path.join(SAVE_PATH, "userData.json"))
     currentTheme = saveLatest.get("settings", {}).get("theme", "dark")  # default to dark
 
+    # Settings Window Configuration
     settings_window = CTkToplevel()
     settings_window.title("Settings")
     settings_window.geometry("400x200")
     settings_window.transient(app)
     settings_window.focus_force()
 
+    # Main Frame For Settings
     main_frame = CTkFrame(settings_window)
     main_frame.grid(sticky="nsew", padx=10, pady=10)
     main_frame.grid_columnconfigure(0, weight=1)
 
+    # String Variable for theme
     theme_var = StringVar(value=currentTheme)
 
+    # Checkbox for dark mode
     dark_checkbox = CTkCheckBox(
         master=main_frame,
         text="Dark Mode",
@@ -258,10 +287,8 @@ def addSettingsWindow():
         command=lambda: changeTheme(theme_var, update=True)
     )
     dark_checkbox.grid(row=0, column=0, pady=10)
-    
-# Load save data from latest session
-saveLatest = readJSON(os.path.join(SAVE_PATH, "userData.json"))
 
+# App Configuration
 app = CTk()
 app.title("hazometric")
 
