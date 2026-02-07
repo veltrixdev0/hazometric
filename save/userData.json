@@ -1,15 +1,5 @@
 {
     "games": {
-        "test": {
-            "title": "test",
-            "description": "test",
-            "path": "test"
-        },
-        "wte": {
-            "title": "wte",
-            "description": "dfhg",
-            "path": "test"
-        }
     },
     "settings": {
         "theme": "dark"
