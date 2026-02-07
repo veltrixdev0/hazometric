@@ -341,9 +341,9 @@ def addSettingsWindow():
 app = CTk()
 app.title("hazometric")
 
-app.geometry("700x550")
-app.maxsize(700,550)
-app.minsize(700,550)
+app.geometry("750x550")
+app.maxsize(750,550)
+app.minsize(750,550)
 
 app.grid_columnconfigure(0, weight=0) # Configures the grid columns
 app.grid_columnconfigure(1, weight=1) # Configures the grid columns
@@ -353,26 +353,26 @@ app.grid_rowconfigure(1, weight=0) # Configures the grid rows
 changeTheme(saveLatest["settings"]["theme"], update=False)
 
 # Games Scroll Frame
-games_scroll_frame = CTkScrollableFrame(master=app, width=200, height=400)
-games_scroll_frame.grid(row=0, column=0, padx=30)
+games_scroll_frame = CTkScrollableFrame(master=app, width=220, height=450)
+games_scroll_frame.grid(row=0, column=0, padx=20, pady=20, sticky="ns")
 games_scroll_frame.grid_columnconfigure(0, weight=1)
 
 # Utils Frame
-utils_frame = CTkFrame(master=app, width=100, height=100)
-utils_frame.grid(row=1,column=0, sticky="ew", padx=5, pady=5)
-utils_frame.grid_columnconfigure(0, weight=1)
+utils_frame = CTkFrame(master=app)
+utils_frame.grid(row=1,column=0, padx=50, pady=(0,20))
+utils_frame.grid_columnconfigure((0,1), weight=1)
 
 # Add to library button
 games_add_button = CTkButton(master=utils_frame, text="Add to library", command=lambda: addLibraryWindow())
-games_add_button.grid(row=0, column=0, pady=5)
+games_add_button.grid(row=0, column=0, padx=5, pady=5, sticky="ew")
 
 # Settings button
 games_settings_button = CTkButton(master=utils_frame, text="Settings", command=lambda: addSettingsWindow())
-games_settings_button.grid(row=1, column=0, pady=5)
+games_settings_button.grid(row=1, column=0, padx=5, pady=5, sticky="ew")
 
 # Tab View Frame
-tab_view_frame = CTkTabview(master=app, width=350, height=400)
-tab_view_frame.grid(row=0, column=1)
+tab_view_frame = CTkTabview(master=app, width=500, height=450)
+tab_view_frame.grid(row=0, column=1, padx=(0,20), pady=20, sticky="nsew")
 
 tab_view_frame.add("Welcome")
 tab_view_frame.set("Welcome")
