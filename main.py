@@ -288,28 +288,54 @@ def addSettingsWindow():
     # Settings Window Configuration
     settings_window = CTkToplevel()
     settings_window.title("Settings")
-    settings_window.geometry("400x200")
+
+    settings_window.geometry("205x220")  # slightly taller for spacing
+    settings_window.maxsize(205, 220)
+    settings_window.minsize(205, 220)
+    
     settings_window.transient(app)
     settings_window.focus_force()
 
     # Main Frame For Settings
-    main_frame = CTkFrame(settings_window)
-    main_frame.grid(sticky="nsew", padx=10, pady=10)
+    main_frame = CTkFrame(settings_window, corner_radius=10)
+    main_frame.grid(sticky="nsew", padx=15, pady=15)
     main_frame.grid_columnconfigure(0, weight=1)
+
+    # Header Label
+    header_label = CTkLabel(
+        master=main_frame,
+        text="Settings",
+        font=CTkFont(size=18, weight="bold")
+    )
+    header_label.grid(row=0, column=0, padx=10, pady=(0, 15))  # space below header
 
     # String Variable for theme
     theme_var = StringVar(value=currentTheme)
 
+    # Dark Mode Frame
+    dark_mode_frame = CTkFrame(master=main_frame, corner_radius=6)
+    dark_mode_frame.grid(sticky="ew", pady=10, padx=10)
+    dark_mode_frame.grid_columnconfigure(0, weight=1)
+    dark_mode_frame.grid_columnconfigure(1, weight=0)
+
     # Checkbox for dark mode
     dark_checkbox = CTkCheckBox(
-        master=main_frame,
-        text="Dark Mode",
+        master=dark_mode_frame,
+        text="Enable Dark Mode",
         variable=theme_var,
         onvalue="dark",
-        offvalue="light",
-        command=lambda: changeTheme(theme_var, update=True) 
+        offvalue="light"
     )
-    dark_checkbox.grid(row=0, column=0, pady=10)
+    dark_checkbox.grid(row=0, column=0, sticky="w", padx=10, pady=10)
+
+    # Optional: Save button (if you want explicit save)
+    save_button = CTkButton(
+        master=main_frame,
+        text="Save Settings",
+        font=CTkFont(size=14),
+        command=lambda: changeTheme(theme_var, update=True)
+    )
+    save_button.grid(row=2, column=0, padx=15, pady=15, sticky="ew")
 
 # App Configuration
 app = CTk()
