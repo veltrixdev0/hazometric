@@ -90,18 +90,22 @@ def removeFromLibrary(title): # Removes from library
 def gameViewFrame(title, description):
     # Game View Frame
     game_view_frame = CTkFrame(master=tab_view_frame.tab(title))
-    game_view_frame.grid(sticky="nsew")
+    game_view_frame.grid(sticky="nsew", padx=10, pady=10)
 
     game_view_frame.grid_columnconfigure(0, weight=1)
-    game_view_frame.grid_rowconfigure(0, weight=1)
+    game_view_frame.grid_rowconfigure(0, weight=0)
+    game_view_frame.grid_rowconfigure(1, weight=0)
+    game_view_frame.grid_rowconfigure(2, weight=0)
+    game_view_frame.grid_rowconfigure(3, weight=0)
+    game_view_frame.grid_rowconfigure(4, weight=1)
 
     # Game View Title
-    game_view_title = CTkLabel(master=game_view_frame, text=title)
-    game_view_title.grid(row=0, column=0, sticky="w")
+    game_view_title = CTkLabel(master=game_view_frame, text=title, font=CTkFont(size=22, weight="bold"), anchor="w")
+    game_view_title.grid(row=0, column=0, sticky="w", padx=15, pady=(10,5))
 
     # Game View Description
-    game_view_description = CTkLabel(master=game_view_frame, text=description)
-    game_view_description.grid(row=1, column=0, sticky="w")
+    game_view_description = CTkLabel(master=game_view_frame, text=description, font=CTkFont(size=14), anchor="w", wraplength=300)
+    game_view_description.grid(row=1, column=0, sticky="w", padx=15, pady=(0,15))
 
     # Get the latest save
     saveLatestJSON = readJSON(os.path.join(SAVE_PATH, "userData.json"))
@@ -112,31 +116,41 @@ def gameViewFrame(title, description):
         print(f"Game '{title}' not found in JSON.")
         return  # Exit early if game not found
 
+    # Frame Button Game View
+    game_view_frame_button = CTkFrame(master=game_view_frame, fg_color="transparent")
+    game_view_frame_button.grid(row=2, column=0, sticky="ew", padx=15, pady=5)
+    game_view_frame_button.grid_rowconfigure((0,1,2), weight=1)
+
     # Game View Play Button
     game_view_play_button = CTkButton(
-        master=game_view_frame,
+        master=game_view_frame_button,
         text="Play",
-        command=lambda: runPath(game["path"])  # Now we have the correct game dictionary
+        command=lambda: runPath(game["path"]), # Run path
+        fg_color="#4CAF50",  # Play color
+        hover_color="#45A049" # Play hover color
     )
-    game_view_play_button.grid(row=2, column=0, sticky="e", pady=5)
+    game_view_play_button.grid(row=0, column=0, sticky="ew", padx=5, pady=5)
 
     # Close tab button
     game_view_close_tab_button = CTkButton(
-        master=game_view_frame,
+        master=game_view_frame_button,
         text="Close this tab",
-        width=50,
-        command=lambda: removeAndSetBackToHome(title)
+        command=lambda: removeAndSetBackToHome(title),
+        fg_color="#FF9800",  # Orange color
+        hover_color="#e68a00" # Orange hover color
     )
-    game_view_close_tab_button.grid(row=3, column=0, pady=3)
+    game_view_close_tab_button.grid(row=1, column=0, sticky="ew", padx=5,pady=5)
 
     # Remove from Library button
     game_view_remove_from_library_button = CTkButton(
-        master=game_view_frame,
+        master=game_view_frame_button,
         text="Remove from library",
         width=50,
-        command=lambda: removeFromLibrary(title)
+        command=lambda: removeFromLibrary(title),
+        fg_color="#f44336", # Warning color
+        hover_color="#da190b" # Warning hover color
     )
-    game_view_remove_from_library_button.grid(row=4, column=0, pady=3)
+    game_view_remove_from_library_button.grid(row=2, column=0, sticky="ew", padx=5,pady=5)
 
 
 def addGameFrame(parent, title, description, logo, row): # Game Card
@@ -284,7 +298,7 @@ def addSettingsWindow():
         variable=theme_var,
         onvalue="dark",
         offvalue="light",
-        command=lambda: changeTheme(theme_var, update=True)
+        command=lambda: changeTheme(theme_var, update=True) 
     )
     dark_checkbox.grid(row=0, column=0, pady=10)
 

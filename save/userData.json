@@ -1,5 +1,11 @@
 {
-    "games": {},
+    "games": {
+        "test": {
+            "title": "test",
+            "description": "test",
+            "path": "test"
+        }
+    },
     "settings": {
         "theme": "dark"
     }
