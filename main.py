@@ -36,15 +36,18 @@ def runPath(application): # Run Path to .exe or other application
 def welcomeFrame():
     # Welcome Frame
     welcome_frame = CTkFrame(master=tab_view_frame.tab("Welcome"))
-    welcome_frame.grid(sticky="nsew")
+    welcome_frame.grid(sticky="nsew", padx=20, pady=20)
+
+    welcome_frame.grid_columnconfigure(0, weight=1)  # Center Horizontallz
+    welcome_frame.grid_rowconfigure((0,1,2), weight=1)  # Distribute vertical space
 
     # Welcome Text Label
-    welcome_label = CTkLabel(master=welcome_frame, text="Welcome!")
-    welcome_label.grid()
+    welcome_label = CTkLabel(master=welcome_frame, text="Welcome!", font=CTkFont(size=28, weight="bold"))
+    welcome_label.grid(row=0, column=0, pady=(40,10))
 
     # Welcome Desc Text Label
-    welcome_desc_label = CTkLabel(master=welcome_frame, text="Start by adding games or accessing them.")
-    welcome_desc_label.grid()
+    welcome_desc_label = CTkLabel(master=welcome_frame, text="Start by adding games or accessing them.", font=CTkFont(size=16), wraplength=400)
+    welcome_desc_label.grid(row=1, column=0, pady=(0,40))
 
 def addAndSet(title, desc): # Adds the tab for the game card
     if title not in tab_view_frame._tab_dict: # Prevents duplicate tabs   
