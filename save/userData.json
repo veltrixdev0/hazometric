@@ -1,4 +1,6 @@
 {
-    "games": {
+    "games": {},
+    "settings": {
+        "theme": "dark"
     }
 }

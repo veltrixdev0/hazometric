@@ -3,7 +3,7 @@ import json
 
 
 def writeJSON(path, content, game_title):
-    data = readJSON(path)
+    data = readJSON(path) # Read json
 
     # Make sure "games" key exists
     if "games" not in data:
@@ -17,7 +17,7 @@ def writeJSON(path, content, game_title):
         json.dump(data, f, indent=4)
 
 def removeJSON(path, game_title):
-    data = readJSON(path)
+    data = readJSON(path) # Read json
 
     # Make sure "games" key exists
     if "games" not in data:
@@ -28,5 +28,18 @@ def removeJSON(path, game_title):
         del data["games"][game_title]
 
     # Save back to file
+    with open(path, "w") as f:
+        json.dump(data, f, indent=4)
+
+
+def addSetting(path, key, content):
+    data = readJSON(path) # Read json
+
+    # Update the theme
+    if "settings" not in data:
+        data["settings"] = {}
+    data["settings"][key] = content
+
+    # Write back to the file
     with open(path, "w") as f:
         json.dump(data, f, indent=4)

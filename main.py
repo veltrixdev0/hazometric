@@ -16,6 +16,7 @@ from PIL import Image
 ## // CONFIGS // ##
 ABS_PATH = os.path.dirname(os.path.abspath(__file__)) # Get absolute path
 SAVE_PATH = os.path.join(ABS_PATH, "save")
+theme_initialized = False
 
 def runPath(application): # Run Path to .exe or other application
     print(f"Running {application}") # Debug
@@ -221,11 +222,62 @@ def addLibraryWindow():
             # Add Game Frame
             addGameFrame(games_scroll_frame, title_text, description_text, False, row_index)
 
+def changeTheme(theme_or_var, update=False):
+    # Determine if input is StringVar or string
+    if isinstance(theme_or_var, StringVar):
+        theme = theme_or_var.get()
+    else:
+        theme = theme_or_var  # assume string
+
+    set_appearance_mode(theme)
+
+    # Check if update is needed
+    if update:
+        app.update_idletasks()
+
+    # Update JSON if needed
+    if update:
+        addSetting(os.path.join(SAVE_PATH, "userData.json"), "theme", theme)
+
+
+def addSettingsWindow(isDarkModeOn="dark"): # Settings window
+    # Settings toplevel window configuration
+    settings_window = CTkToplevel()
+    settings_window.title("Add to Library")
+    settings_window.geometry("400x300")
+
+    settings_window.grid_columnconfigure(0, weight=1)
+    settings_window.grid_rowconfigure(0, weight=1)
+
+    settings_window.focus_force()
+    settings_window.transient(app)
+
+    # Frame inside top-level
+    main_settings_frame = CTkFrame(master=settings_window)
+    main_settings_frame.grid(sticky="ew",padx=10, pady=10, row=0, column=0)
+    main_settings_frame.grid_columnconfigure(0, weight=1)
+    main_settings_frame.grid_rowconfigure(0, weight=1)
+
+    # Dark mode check box
+    darkmode_var = StringVar(value=isDarkModeOn)
+    dark_mode_check_box = CTkCheckBox(
+        master=main_settings_frame,
+        text="Dark Mode",
+        variable=darkmode_var,
+        onvalue="dark",
+        offvalue="light",
+        command=lambda: changeTheme(darkmode_var, update=True)
+    )
+    dark_mode_check_box.grid(row=0, column=0)
+
 
 # Load save data from latest session
 saveLatest = readJSON(os.path.join(SAVE_PATH, "userData.json"))
 
 # Main App Configuration
+
+changeTheme(saveLatest["settings"]["theme"], update=False)
+
 app = CTk()
 app.title("hazometric")
 
@@ -253,7 +305,7 @@ games_add_button = CTkButton(master=utils_frame, text="Add to library", command=
 games_add_button.grid(row=0, column=0, pady=5)
 
 # Settings button
-games_settings_button = CTkButton(master=utils_frame, text="Settings")
+games_settings_button = CTkButton(master=utils_frame, text="Settings", command=lambda: addSettingsWindow(saveLatest["settings"]["theme"]))
 games_settings_button.grid(row=1, column=0, pady=5)
 
 
