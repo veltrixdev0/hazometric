@@ -89,7 +89,6 @@ def removeFromLibrary(title): # Removes from library
 
     removeAndSetBackToHome(title) # Sets back at home
 
-
 def gameViewFrame(title, description):
     # Game View Frame
     game_view_frame = CTkFrame(master=tab_view_frame.tab(title))
@@ -158,9 +157,8 @@ def gameViewFrame(title, description):
 
 def addGameFrame(parent, title, description, logo, row): # Game Card
     # Game Card Button
-    btn = CTkButton(master=parent, text=title, command=lambda: addAndSet(title=title, desc=description))
-    btn.grid(sticky="ew", pady=4, row=row, column=0)
-
+    btn = CTkButton(master=parent, text=f"▶ {title}", command=lambda: addAndSet(title=title, desc=description))
+    btn.grid(sticky="ew", pady=6, padx=5, row=row, column=0)
     # Store reference for fast removal
     game_buttons[title] = btn
 
