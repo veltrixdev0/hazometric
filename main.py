@@ -264,7 +264,7 @@ def addLibraryWindow():
 
         if title_text and path_text:  # simple check
             writeJSON(
-                os.path.join(SAVE_PATH, "userData.json"),
+                USER_JSON_PATH,
                 {"title": title_text, "description": description_text, "path": path_text},
                 title_text
             )
@@ -283,7 +283,7 @@ def changeTheme(theme_or_var, update=False):
 
     # Save to JSON if requested
     if update:
-        addSetting(os.path.join(SAVE_PATH, "userData.json"), "theme", theme)
+        addSetting(USER_JSON_PATH, "theme", theme)
         app.update_idletasks()
 
 def addSettingsWindow():
