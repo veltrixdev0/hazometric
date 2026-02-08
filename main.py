@@ -8,8 +8,10 @@ data = readJSON(os.path.join(SAVE_PATH, "userData.json"))
 
 '''
 from customtkinter import *
+
 from utils.readJSON import *
 from utils.addJSON import *
+from utils.persistentPath import *
 
 from PIL import Image
 
@@ -18,16 +20,19 @@ ABS_PATH = os.path.dirname(os.path.abspath(__file__)) # Get absolute path
 SAVE_PATH = os.path.join(ABS_PATH, "save")
 theme_initialized = False
 
+USER_JSON_PATH = get_user_json()
+print(f"Persistent Path: {USER_JSON_PATH}")
+
 # Store references to game buttons for fast access
 game_buttons = {}
 
 # Load save data from startup
-saveLatest = readJSON(os.path.join(SAVE_PATH, "userData.json"))
+saveLatest = readJSON(USER_JSON_PATH)
 
 # Reload JSON after changes
 def reloadJSON():
     global saveLatest
-    saveLatest = readJSON(os.path.join(SAVE_PATH, "userData.json")) 
+    saveLatest = readJSON(USER_JSON_PATH) 
 
 def runPath(application): # Run Path to .exe or other application
     print(f"Running {application}") # Debug
@@ -110,7 +115,7 @@ def gameViewFrame(title, description):
     game_view_description.grid(row=1, column=0, sticky="w", padx=15, pady=(0,15))
 
     # Get the latest save
-    saveLatestJSON = readJSON(os.path.join(SAVE_PATH, "userData.json"))
+    saveLatest = readJSON(USER_JSON_PATH) 
 
     # Fetch the game info from JSON
     game = saveLatest.get("games", {}).get(title) # Cache JSON
