@@ -191,9 +191,9 @@ def addLibraryWindow():
     library_window = CTkToplevel()
     library_window.title("Add to Library")
 
-    library_window.geometry("290x250")
-    library_window.minsize(290, 250)
-    library_window.maxsize(290, 250)
+    library_window.geometry("290x350")
+    library_window.minsize(290, 350)
+    library_window.maxsize(290, 350)
 
     library_window.focus_force()
     library_window.transient(app)
