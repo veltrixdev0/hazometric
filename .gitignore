@@ -5,6 +5,7 @@ __pycache__/
 *.pyd
 *.pycache/
 *.pdb
+setup.py
 
 # PyInstaller
 /dist/

@@ -39,6 +39,9 @@ def runPath(application): # Run Path to .exe or other application
     os.startfile(application) # Starts the file
 
 def welcomeFrame():
+    # Clear Search
+    clearSearch()
+
     # Welcome Frame
     welcome_frame = CTkFrame(master=tab_view_frame.tab("Welcome"))
     welcome_frame.grid(sticky="nsew", padx=20, pady=20)
@@ -342,6 +345,23 @@ def addSettingsWindow():
     )
     save_button.grid(row=2, column=0, padx=15, pady=15, sticky="ew")
 
+def filterGames(*_): # Filter games
+    query = games_scroll_frame_entry.get().lower().strip() # Get the search text
+
+    for title, btn in game_buttons.items(): # Find for any buttons relevant to it
+        if query in title.lower():
+            btn.grid() # Show
+        else:
+            btn.grid_remove() # Hide
+
+def clearSearch(event=None):
+    games_scroll_frame_entry.delete(0, "end")
+    app.focus_set()
+    filterGames()
+
+def focusSearch(event=None):
+    games_scroll_frame_entry.focus_set()
+
 # App Configuration
 app = CTk()
 app.title("hazometric")
@@ -349,17 +369,41 @@ app.title("hazometric")
 app.geometry("750x550")
 app.maxsize(750,550)
 app.minsize(750,550)
+app.iconbitmap("media/icon.ico")
 
 app.grid_columnconfigure(0, weight=0) # Configures the grid columns
 app.grid_columnconfigure(1, weight=1) # Configures the grid columns
 app.grid_rowconfigure(0, weight=1) # Configures the grid rows
 app.grid_rowconfigure(1, weight=0) # Configures the grid rows
 
+app.bind("<Control-f>", focusSearch)
+
 changeTheme(saveLatest["settings"]["theme"], update=False)
 
+# Games Frame
+games_Frames = CTkFrame(master=app,width=220, height=450)
+games_Frames.grid(row=0,column=0, padx=20, pady=20, sticky="ns")
+games_Frames.grid_columnconfigure(0, weight=1)
+
+# Search Bar Container
+search_container = CTkFrame(master=games_Frames, fg_color="transparent")
+search_container.grid(row=0, column=0, padx=5, pady=5, sticky="ew")
+search_container.grid_columnconfigure(0,weight=1)
+
+# Games Search Bar
+games_scroll_frame_entry = CTkEntry(master=search_container, placeholder_text="Search applications", height=34)
+games_scroll_frame_entry.grid(row=0, column=0, sticky="ew")
+
+games_scroll_frame_entry.bind("<KeyRelease>", filterGames)
+games_scroll_frame_entry.bind("<Escape>", clearSearch)
+
+# Clear Button
+clear_button = CTkButton(master=search_container, text="✕", width=28, height=28, command=clearSearch)
+clear_button.grid(row=0,column=1, padx=(6,0))
+
 # Games Scroll Frame
-games_scroll_frame = CTkScrollableFrame(master=app, width=220, height=450)
-games_scroll_frame.grid(row=0, column=0, padx=20, pady=20, sticky="ns")
+games_scroll_frame = CTkScrollableFrame(master=games_Frames, height=350)
+games_scroll_frame.grid(row=1, column=0, padx=5, pady=5, sticky="ns")
 games_scroll_frame.grid_columnconfigure(0, weight=1)
 
 # Utils Frame
@@ -388,7 +432,5 @@ welcomeFrame() # Adds welcome
 for i, (game_id, game) in enumerate(saveLatest["games"].items()):
     addGameFrame(games_scroll_frame, game["title"], game["description"], False, i)
     print(type(game), game)
-
-
 
 app.mainloop() # Keeps the app running
