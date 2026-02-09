@@ -15,9 +15,20 @@ from utils.persistentPath import *
 
 from PIL import Image
 
+import os, sys, shutil
+
 ## // CONFIGS // ##
 ABS_PATH = os.path.dirname(os.path.abspath(__file__)) # Get absolute path
-SAVE_PATH = os.path.join(ABS_PATH, "save")
+SAVE_PATH = os.path.join(ABS_PATH, "save")  
+
+if getattr(sys, 'frozen', False):
+    # Running in PyInstaller bundle
+    ABS_PATH = sys._MEIPASS
+else:
+    ABS_PATH = os.path.dirname(os.path.abspath(__file__))
+
+ICON_PATH = os.path.join(ABS_PATH, "media", "icon.ico")
+
 theme_initialized = False
 
 USER_JSON_PATH = get_user_json()
@@ -369,7 +380,7 @@ app.title("hazometric")
 app.geometry("750x550")
 app.maxsize(750,550)
 app.minsize(750,550)
-app.iconbitmap("media/icon.ico")
+app.iconbitmap(ICON_PATH)
 
 app.grid_columnconfigure(0, weight=0) # Configures the grid columns
 app.grid_columnconfigure(1, weight=1) # Configures the grid columns
